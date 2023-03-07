@@ -70,9 +70,16 @@ function characterEssentials(x,y,pickup_type = pickups[Math.floor(Math.random() 
     this.type = {replenisher:{images_path:""},health_pack:{images_path:"/assets/pickups/health_pack/"}, revive:{images_path:""}};
     let no_of_frames = 11
     this.init_images= function(){
+        try{
         for (let i=1;i<no_of_frames+1;i++){
             this.images[i-1]=loadImage(`${this.type[pickup_type].images_path}${pickup_type} (${i}).png`);  
-        }   
+        }   }
+        catch {
+            // /Intensity
+            for (let i=1;i<no_of_frames+1;i++){
+                this.images[i-1]=loadImage(`/Intensity${this.type[pickup_type].images_path}${pickup_type} (${i}).png`);  
+            }  
+        }
     }
 
     this.show = function(img , shadow_frame) {

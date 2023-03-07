@@ -54,8 +54,11 @@ function Enemy(x,y){
         // for (let i=1;i<no_of_frames+1;i++){
         //     this.images_back[i-1]=loadImage(`${path}/back/back (${i}).png`)  
         // }
-        for (let i=1;i<no_of_frames+1;i++){
+        try{for (let i=1;i<no_of_frames+1;i++){
             this.images_front[i-1]=loadImage(`${path}/front/front (${i}).png`)
+        }}catch {
+            this.images_front[i-1]=loadImage(`/Intensity${path}/front/front (${i}).png`); 
+    // /Intensity/assets/pickups/health_pack/health_pack%20(1).png
         }
         // for (let i=1;i<no_of_frames+1;i++){
         //     this.images_left[i-1]=loadImage(`${path}/left/left (${i}).png`)
