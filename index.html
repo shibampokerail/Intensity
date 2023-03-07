@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/addons/p5.sound.js"></script> 
+    <!-- <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script> -->
+       <style>
+        html, body {margin: 0; height: 100%; overflow: hidden}
+        #defaultCanvas0
+        { filter: brightness(0.5) contrast(1.4)  saturate(1.5);
+          animation: brightanim 60s infinite;
+        }
+        @keyframes brightanim {
+          50%
+          {
+            filter: brightness(1) contrast(1)  saturate(1.5);
+          }
+        }
+        @media only screen and (max-width: 1000px) {
+  body {
+    background-color: lightblue;
+  }
+
+  .floatL{
+    display: block;
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	left:40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+.floatR{
+  display: block;
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+
+
+}
+.floatL{
+  display: none;
+
+}
+.floatR{
+  display: none;
+}
+    </style>
+    <!--for buttons in android -->
+    <button href="#" class="floatL" onclick="phone_movement='l'">
+      <h1><</h1>
+    </button>
+      <button href="#" class="floatR" onclick="phone_movement='r'">
+        <h1>></h1>
+      </button>
+</head>
+<body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+      // Using firebase v8 becasue v9 is completely different from what i was used to
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAYa1w_EdHlnx3A8NW6Dmyh2zQAXIGhM9E",
+        authDomain: "multiplayer-demo-94d36.firebaseapp.com",
+        databaseURL: "https://multiplayer-demo-94d36-default-rtdb.firebaseio.com",
+        projectId: "multiplayer-demo-94d36",
+        storageBucket: "multiplayer-demo-94d36.appspot.com",
+        messagingSenderId: "827286846339",
+        appId: "1:827286846339:web:b6564865d392636807d4b6"
+      };
+    
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+   <script src="scripts/sketch.js"></script>
+   <script src="scripts/character.js"></script>
+   <script src="scripts/enemy.js"></script>
+   <script src="scripts/attack.js"></script>
+   <script src="scripts/server.js"></script>
+   <script src="scripts/cameraShake.js"></script>
+   <script src="scripts/map.js"></script>
+   <script src="scripts/animation.js"></script>
+   <script src="scripts/renderUI.js"></script>
+   <script src="scripts/mobileSupport.js"></script>
+   <script src="scripts/rain.js"></script>
+   <script src="scripts/menuScreen.js"></script>
+
+   
+
+   
+</body>
+</html>
