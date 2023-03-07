@@ -10,8 +10,8 @@ var walk_sound;
 var title_sound;
 var frameToShow=0; //do not attempt to change this variable
 //frame to show variable will be channged in plyr.js to make the character when key is pressed
-let no_of_enemies =50;
-let no_of_health_pickups = 30;
+let no_of_enemies =0;
+let no_of_health_pickups = 0;
 let bgImage;//do not change this variaable
 let crosshair_image;
 let collect_colliders = [{x:0,y:0,w:0,h:0}];
