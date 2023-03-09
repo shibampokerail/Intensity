@@ -5,13 +5,12 @@ function Rain()
     this.y = Math.random()*1000;
     this.c = this.y - this.x*this.slope;
     
-    this.show = function (color)
+    this.show = function ()
     {
         let randomLength = Math.random()*100
         line(this.x,this.y,this.generateX(this.y+randomLength),this.y+randomLength);
         stroke(200);
     }
-    
 
     this.move = function()
     {

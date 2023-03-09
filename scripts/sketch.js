@@ -5,17 +5,20 @@ var enemies = []; // do not change this variable
 var attacks = [];
 var health_pickups = [];
 var img=[];
+var blood_particles =[];
 var bullet_sound;
 var walk_sound;
-var title_sound;
 var frameToShow=0; //do not attempt to change this variable
 //frame to show variable will be channged in plyr.js to make the character when key is pressed
-let no_of_enemies =0;
-let no_of_health_pickups = 0;
+let no_of_enemies =100;
+let no_of_health_pickups = 20;
 let bgImage;//do not change this variaable
 let crosshair_image;
 let collect_colliders = [{x:0,y:0,w:0,h:0}];
 let debug_colliders = false;  
+var title_sound;
+let timer = 10000;
+
 
 let map_depth; 
 
@@ -34,12 +37,13 @@ let renderMenu;
 var titleFont;
 var basicFont;
 let onMainMenu = true;
-let bloodSplash;
-let animate_bloodSplash;
-let time_ = 0;
-let dead_enemy_pos = {x:0,y:0}
+let initialX;
+let initialY;
+let frameCount = 0;
+let kills_needed = 100;
 // let rain_timer = parseInt(Math.random()*2000);
 function preload(){
+    
     titleFont = loadFont('assets/font/Nos.ttf');
     basicFont = loadFont('assets/font/stat.ttf');
      plyr = new Character();
@@ -48,31 +52,30 @@ function preload(){
      plyr.direction = 'r'; //.direction is needed for projectile direction when pressing space
      plyr.x=windowWidth/2;
      plyr.y=windowHeight/2;
-     console.log(windowWidth);
+     
     //  walk_sound = loadSound('assets/sound/walk.mp3');
-     title_sound = loadSound('assets/sound/titlescreen.mp3');
      bullet_sound = loadSound('assets/sound/gunshot.mp3');
+     title_sound = loadSound('assets/sound/titlescreen.mp3');
      enemy = loadImage("assets/enemy/idle/enemy (1).png"); 
      bgImage = new Map("map_main.jpg",0,0);
      bgImage.init()
+     initialX = bgImage.x;
+     initialY = bgImage.y;
      crosshair_image = loadImage("assets/crosshair.png"); 
      renderUI = new RenderUI(plyr);
      renderUI.init_images('assets/ui/');
      renderMenu = new MenuScreen();
-     generateEnemy(50);
+     renderMenu.init_images();
+     generateEnemy(no_of_enemies);
      for (let i=0;i<no_of_health_pickups;i++){
         health_pickups[i] = new characterEssentials(Math.random()*4000, Math.random()*4000, "health_pack"); 
         // enemies[i].init_images();
         health_pickups[i].init_images();
-        animate_health_pickups[i] = new Animate(health_pickups[i].images, 5);
+        animate_health_pickups[i] = new Animate(health_pickups[i].images, 12);
      }
-     bloodSplash = new bloodParticles(0,0);
-     bloodSplash.init_images();
-     animate_bloodSplash = new Animate(bloodSplash.images, 9, true);
-     ;
+     
     adjustDeviceColliderX = (windowWidth-nativeWidth)/2;
     adjustDeviceColliderY = (windowHeight-nativeHeight)/2;
-
 
     // map_depth = loadImage("assets/maps/map_main_depth.png"); 
     }
@@ -85,8 +88,10 @@ function setup(){
     // connectPlayer();
     // livePlayersInfo();
     // livePlayersConnection();
-
     noCursor();
+
+    
+    
     createCanvas(windowWidth, windowHeight);
     
     let attack_width_pos=width/2+30;
@@ -107,17 +112,45 @@ function sortEnemy()
 function generateEnemy(number)
 {
     for (let i=0;i<number;i++){
-        let enemy = new Enemy(Math.random()*4000,Math.random()*4000); 
+        let posx = (2*Math.random() -1)*bgImage.x;
+        let posy = (2*Math.random() -1)*bgImage.y;
+
+        let enemy = new Enemy(posx,posy); 
         // enemies[i].init_images();
-        enemy.init_goblin_images("/assets/enemy/goblin",6);
+        enemy.init_goblin_images("assets/enemy/goblin",6);
         anim_enemy = new Animate(enemy.images_front, 2);
+        setTimeout(()=>{
+            enemy.renderReady = true;
+        },2000)
         enemies.push(enemy);
         animate_enemy.push(anim_enemy);
+        
      }
+     
 }
 function draw(){
+    console.log(timer);
     // console.log("chill");
-    
+    if(plyr.health<=0)
+    {
+        timer = 10000;
+        if(!onMainMenu)
+        {
+            enemies.map((enemy)=>{
+                enemy.x = (2*Math.random() -1)*bgImage.x;
+                enemy.y = (2*Math.random() -1)*bgImage.y;
+            })
+        }
+        onMainMenu = true;
+        
+        renderMenu.menuItems[1]["text"]="RETRY";
+        
+    }
+
+  if (timer<=0){
+    plyr.health = 0;
+  }
+  frameCount+=1;
     connected = true;//not connecting to firebase at the moment
     // $(window).blur(function() {
     //     console.log("inactive Window")
@@ -147,7 +180,10 @@ function draw(){
     {
     bgImage.show();
     bgImage.activate_colliders(bgImage.x,bgImage.y);
-    bgImage.activate_events(bgImage.x,bgImage.y);
+    if (renderMenu.mode=="TIME TRIAL"){
+        bgImage.activate_events(bgImage.x,bgImage.y);
+    }
+    
     
     let playerRendered = false;
     sortEnemy();
@@ -155,7 +191,17 @@ function draw(){
     
     var edge = false;
     
-    
+    if (bgImage.saved_settings[bgImage.name].type!="calm"){blood_particles.map((blood_particle,index)=>{
+        
+        blood_particle.showAnim();
+        
+        // if(blood_particle.state>=7)
+        // {
+        //     splice(blood)
+        // }
+
+        
+    })}
     if (bgImage.saved_settings[bgImage.name].enemiesCount>0)
     
     
@@ -180,19 +226,35 @@ function draw(){
             playerRendered = true;
             plyr.show(img[frameToShow],plyr.x,plyr.y);
         }  
-        
-        enemies[i].show(enemies[i].images_front[animate_enemy[i].frame()]);
-        // animate_enemy[i].display();
-        animate_enemy[i].change_frames();
-        if(!onMainMenu)
+        if(enemies[i].renderReady)
         {
-        enemies[i].move();
+            enemies[i].show(enemies[i].images_front[animate_enemy[i].frame()]);
+            // animate_enemy[i].display();
+            animate_enemy[i].change_frames();
+            if(!onMainMenu)
+            {
+            if (renderMenu.mode=="TIME TRIAL"){
+                if (frameCount % 40 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+                    timer -=1;
+                }
+            }
+            enemies[i].move();
+            
 
+            }
         }
+        
         
     }
 
 }
+if(!onMainMenu)
+{
+if (renderMenu.mode=="TIME TRIAL"){
+    if (frameCount % 40 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+        timer -=1;
+    }
+}}
     
     if(!playerRendered)
     {
@@ -202,11 +264,8 @@ function draw(){
     if (bgImage.saved_settings[bgImage.name].depth.path!=""){
         bgImage.show_depth(bgImage.x,bgImage.y);
     }
-    if (time_==0 && dead_enemy_pos.x!=0 && dead_enemy_pos.y!=0){
-        console.log("okay");
-        bloodSplash.show(bloodSplash.images[animate_bloodSplash.frame()],bgImage.x+dead_enemy_pos.x,bgImage.y+dead_enemy_pos.y);
-    }
-    animate_bloodSplash.change_frames();
+    
+   
     
 
    for (let i=0;i<attacks.length;i++){
@@ -216,17 +275,23 @@ function draw(){
                 if (attacks[i].hits(enemies[j])){
                     enemies[j].health-=1;
                     if (enemies[j].health<1){
-                        dead_enemy_pos.x = enemies[j].x;
-                        dead_enemy_pos.y = enemies[j].y;
-                        enemies.splice(j,1);
-                        generateEnemy(1);
-                        time_ = 0;
+                        enemies[j].health = Math.random() * (enemies[j].MAX_HEALTH - enemies[j].MIN_HEALTH) + enemies[j].MIN_HEALTH;
+                        
+                        enemies[j].x = (2*Math.random() -1)*bgImage.x;
+                        enemies[j].y = (2*Math.random() -1)*bgImage.y;
+                        plyr.score++;
+                        
                     } 
                     attacks[i].evaporate();
+                    
+                    let blood = new Blood(enemies[j].x-bgImage.x,enemies[j].y-bgImage.y);
+                    blood.init_image("assets/blood",8);
+                    blood_particles.push(blood)
                 }
             }
     }
-    time_++
+     
+   
    for (let i=(attacks.length-1);i>=0;i--){
         if (attacks[i].toDelete){
             attacks.splice(i,1);
@@ -261,7 +326,8 @@ function draw(){
             // updatePlayer(playerObj);
         }
         if (keyIsDown(SHIFT)){
-                plyr.movement_speed = 10;    
+                plyr.movement_speed = 10;
+                    
         }
         if (keyIsDown(76)){
             debug_colliders = true;
@@ -278,7 +344,7 @@ function draw(){
         renderUI.renderRainParticles();
         
     } 
-   
+    renderUI.renderScore(plyr);
     renderUI.renderHealth();
     if(onMainMenu)
     {   
@@ -292,6 +358,12 @@ function draw(){
         }
     }
     image(crosshair_image, mouseX-25,mouseY-25, 50,50);
+
+    if (bgImage.saved_settings[bgImage.name].type=="calm"){
+        plyr.health+=0.1;
+
+    }
+    // image(crosshair_image, mouseX-25,mouseY-25, 50,50);
 
     
 
@@ -308,6 +380,7 @@ function mousePressed(){
     
     if (!is_phone && bgImage.saved_settings[bgImage.name].type=="hostile"){
         if (plyr.health>0){
+            
             bullet_sound.play();
     if (!onMainMenu){
         bullet_sound.play();
@@ -325,17 +398,17 @@ function mousePressed(){
         // console.log("attack start",plyr.x,plyr.y);
 }
 
-function mouseDragged(){
-    //for machine gun
-    // var audio = new Audio('/assets/sound/gunshot.mp3');
-    // audio.play();
-    if (plyr.health>0 && bgImage.saved_settings[bgImage.name].type=="hostile" && !onMainMenu){
-    // cameraShake(10,30);
-    // var attack = new Attack(plyr.x+60,plyr.y+20, plyr.direction, mouseX, mouseY, true);
-    //     attacks.push(attack);
-    //     plyr.change_frames(true);
-    //     console.log("attack start",plyr.x,plyr.y);
-}}
+// function mouseDragged(){
+//     //for machine gun
+//     // var audio = new Audio('assets/sound/gunshot.mp3');
+//     // audio.play();
+//     if (plyr.health>0 && bgImage.saved_settings[bgImage.name].type=="hostile"){
+//     cameraShake(10,30);
+//     var attack = new Attack(plyr.x+60,plyr.y+20, plyr.direction, mouseX, mouseY, true);
+//         attacks.push(attack);
+//         plyr.change_frames(true);
+//         console.log("attack start",plyr.x,plyr.y);
+// }}
 
 function mouseReleased(){
     
@@ -352,11 +425,11 @@ function mouseReleased(){
 function keyPressed(){
     // walk_sound.play();
     
-    // if (key===" "){
-    //     var attack = new Attack(plyr.x+60,plyr.y+20, plyr.direction);
-    //     attacks.push(attack);
-    //     plyr.change_frames(true);
-    // }
+    if (key===" "){
+        var attack = new Attack(plyr.x+60,plyr.y+20, plyr.direction);
+        attacks.push(attack);
+        plyr.change_frames(true);
+    }
 
     if (key=="q"){
         if (collect_colliders.at(-1).x==0 && collect_colliders.at(-1).y==0){
@@ -381,12 +454,12 @@ function keyPressed(){
         collect_colliders.pop()
         if (!(collect_colliders.at(-1).w==0 && collect_colliders.at(-1).h==0)){
         bgImage.saved_settings[bgImage.name].colliders.pop();}
-        console.log(collect_colliders.at(-1));
+        
         collect_colliders.push({x:0,y:0,w:0,h:0})
     }
 
     if (key=="z"){
-        console.log(bgImage.x,bgImage.y);
+       
         
     }
     

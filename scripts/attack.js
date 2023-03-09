@@ -46,7 +46,7 @@ function Attack(x,y,dir,finalx=0,finaly=0, mouse=false){ //remove dir and mouse 
     }
 
     this.hits = function(flower){
-        var d = dist(this.x-100, this.y-130, flower.x-50, flower.y-60);
+        var d = dist(this.x-100, this.y-130, flower.x-50, flower.y-50);//changed the +20 and -20 for enemy.png
         if (d<this.r +flower.r)
         {
             return true;

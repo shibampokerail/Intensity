@@ -3,7 +3,7 @@ function Enemy(x,y){
     
     this.x = x;
     this.y = y;
-
+    this.renderReady=false;
     this.r=40;
     this.images=[];
     this.xDir=1;
@@ -12,8 +12,8 @@ function Enemy(x,y){
     this.mapX = this.x;
     this.mapY = this.y;
 
-    const MAX_HEALTH = 5;
-    const MIN_HEALTH = 1;
+    this.MAX_HEALTH = 5;
+    this.MIN_HEALTH = 1;
     this.damage = 1;
 
     this.images_back = [];
@@ -23,7 +23,7 @@ function Enemy(x,y){
 
     this.current_image_array = [];
 
-    this.health = Math.random() * (MAX_HEALTH - MIN_HEALTH) + MIN_HEALTH;
+    this.health = Math.random() * (this.MAX_HEALTH - this.MIN_HEALTH) + this.MIN_HEALTH;
 
     this.movement_speed = Math.random() *6 + 2;
     speed =  this.movement_speed;
@@ -39,7 +39,7 @@ function Enemy(x,y){
 
         for (let i=0;i<no_of_frames;i++){
             
-            this.images[i]=loadImage(`assets/enemy/idle/enemy (${i+1}).png`)
+            this.images[i]=loadImage(`assets/enemy/idle/enemy/(${i+1}).png`)
         }
         
    
@@ -54,11 +54,8 @@ function Enemy(x,y){
         // for (let i=1;i<no_of_frames+1;i++){
         //     this.images_back[i-1]=loadImage(`${path}/back/back (${i}).png`)  
         // }
-        try{for (let i=1;i<no_of_frames+1;i++){
+        for (let i=1;i<no_of_frames+1;i++){
             this.images_front[i-1]=loadImage(`${path}/front/front (${i}).png`)
-        }}catch {
-            this.images_front[i-1]=loadImage(`/Intensity${path}/front/front (${i}).png`); 
-    // /Intensity/assets/pickups/health_pack/health_pack%20(1).png
         }
         // for (let i=1;i<no_of_frames+1;i++){
         //     this.images_left[i-1]=loadImage(`${path}/left/left (${i}).png`)
@@ -84,9 +81,9 @@ function Enemy(x,y){
             console.log("enemy",this.x,this.y);
         // console.log("enemyV2", bgImage.x-this.x+(finalX-plyr.x), bgImage.y-this.y+((finalY-plyr.y)));
         // console.log("player", bgImage.x-plyr.x, bgImage.y-plyr.y);
-        console.log("enemyV2", bgImage.x-this.x+(finalX), bgImage.y-this.y+((finalY)));
-        console.log("player", bgImage.x, bgImage.y);
-        console.log("window_Width,window_height", windowWidth, windowHeight);
+        // console.log("enemyV2", bgImage.x-this.x+(finalX), bgImage.y-this.y+((finalY)));
+        // console.log("player", bgImage.x, bgImage.y);
+        // console.log("window_Width,window_height", windowWidth, windowHeight);
         plyr.health = 100;
         } else {
             this.movement_speed = speed;
@@ -111,8 +108,7 @@ function Enemy(x,y){
                 let ratio = this.movement_speed / dist;
                 let x_move = ratio * delta_x;   //the ratio by which x should increase
                 let y_move = ratio * delta_y; //the ratio by which y should increase
-                // console.log(x_move,y_move);
-
+                
                 // if ((bgImage.check_collision(bgImage.x-this.x+finalX,bgImage.y-this.y+finalY))){
                 //     console.log("okay enemy collided");
                 // }
