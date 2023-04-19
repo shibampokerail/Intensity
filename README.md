@@ -5,4 +5,4 @@ Intensity is a zombie shooter game made using P5.js (mouse needed)
 - Two characters to choose from
 - A huge map
 
-try it out [here!](https://shibampokhrel.com/Intensity)
+try it out by clicking [here!](https://shibampokhrel.com/Intensity)
